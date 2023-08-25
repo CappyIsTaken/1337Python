@@ -60,8 +60,11 @@ class MyBot(commands.Bot):
 
 
         
-        @self.command("add", pass_context=True)
+        @self.command("add", pass_context=True, aliases=["a"])
         async def _add(ctx: commands.Context, sentence: str):
+            """
+            Adds a sentence to the sentences for this current channel!
+            """
             db = client["Sentences"]
             sentences = db["Sentences"]
             sentences.find_one_and_update(filter={
@@ -79,8 +82,11 @@ class MyBot(commands.Bot):
                 await ctx.send(content="No sentence was given to add, please input a sentence!")
 
 
-        @self.command("setup", pass_context=True)
+        @self.command("setup", pass_context=True, aliases=["s"])
         async def _setup(ctx: commands.Context):
+            """
+            Sets up the channel for the bot!
+            """
             db = client["Sentences"]
             sentences = db["Sentences"]
             sentences.insert_one({
@@ -93,8 +99,11 @@ class MyBot(commands.Bot):
         
 
 
-        @self.command("view", pass_context=True)
+        @self.command("view", pass_context=True, aliases=["v"])
         async def _view(ctx):
+            """
+            Shows all the sentences for this current channel
+            """
             db = client["Sentences"]
             sentences = db["Sentences"]
             doc = sentences.find_one({
@@ -108,22 +117,32 @@ class MyBot(commands.Bot):
             for i,s in enumerate(all_s):
                  m += f"{i+1}. `{textwrap.shorten(s, 25, placeholder='...')}`\n"
             await ctx.before_message.edit(content=m)
-        @self.command("del", pass_context=True)
+
+       
+
+        @self.command("del", pass_context=True, aliases=["d"])
         async def _del(ctx, index: int):
+            """
+            Deletes a sentence given an index in the list
+            """
             db = client["Sentences"]
             sentences = db["Sentences"]
-            sentences.find_one_and_update(filter={
+            t = sentences.find_one_and_update(filter={
                 "channel_id": ctx.channel.id
             }, update={
                 "$unset": {f"sentences.{index-1}": 1}
             })
-            sentences.find_one_and_update(filter={
+            t1 = sentences.find_one_and_update(filter={
                 "channel_id": ctx.channel.id
             }, update={
                 "$pull": {"sentences": None}
             })
             await ctx.before_message.edit(content="Deleted sentence successfully!")
-                     
+
+        @_del.error
+        async def _del_error(ctx, error):
+            if isinstance(error, commands.errors.MissingRequiredArgument):
+                await ctx.send(content="No index was given, please input an index!")             
 
 
 bot = MyBot(command_prefix=discord.ext.commands.when_mentioned_or("!"), intents=discord.Intents.all())
