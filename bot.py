@@ -102,7 +102,7 @@ class MyBot(commands.Bot):
             })
             all_s = doc.get("sentences")
             if len(all_s) <= 0:
-                await ctx.before_message.edit(content="No sentences were found!")
+                await ctx.before_message.edit(content="No sentences were found, bitchass, add some sentences!")
                 return
             m = ""
             for i,s in enumerate(all_s):
