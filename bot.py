@@ -74,7 +74,7 @@ class MyBot(commands.Bot):
                     "sentences": sentence
                 }
             })
-            await ctx.before_message.edit(content=f"Added `{textwrap.shorten(sentence, 25, placeholder='...')}` successfully!")
+            await ctx.before_message.edit(content=f"Added `{textwrap.shorten(sentence, 50, placeholder='...')}` successfully!")
         
         @_add.error
         async def _add_error(ctx, error):
@@ -117,7 +117,7 @@ class MyBot(commands.Bot):
             if index <= 0:
                 m = ""
                 for i,s in enumerate(all_s):
-                    m += f"{i+1}. `{textwrap.shorten(s, 25, placeholder='...')}`\n"
+                    m += f"{i+1}. `{textwrap.shorten(s, 50, placeholder='...')}`\n"
                 await ctx.before_message.edit(content=m)
             else:
                 try:
