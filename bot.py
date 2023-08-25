@@ -106,7 +106,7 @@ class MyBot(commands.Bot):
                 return
             m = ""
             for i,s in enumerate(all_s):
-                 m += f"{i+1}. {textwrap.shorten(s.get('content'), 25, placeholder='...')}\n"
+                 m += f"{i+1}. {textwrap.shorten(s, 25, placeholder='...')}\n"
             await ctx.before_message.edit(content=m)
         @self.command("del", pass_context=True)
         async def _del(ctx, index: int):
