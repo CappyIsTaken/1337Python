@@ -30,7 +30,7 @@ class MyBot(commands.Bot):
         self.register_commands()
 
     
-    @tasks.loop(time=time)
+    @tasks.loop(seconds=10)
     async def post_1337(self):
         db = client["Sentences"]
         sentences = db["Sentences"]
@@ -39,15 +39,20 @@ class MyBot(commands.Bot):
             c_id = s.get("channel_id")
             current = s.get("current")
             c = discord.utils.get(self.get_all_channels(), id=c_id)
-            await c.send(content=s.get("sentences")[current])
-            sentences.find_one_and_update(filter={
-                "channel_id": c_id,
+            try:
+                await c.send(content=s.get("sentences")[current])
+                sentences.find_one_and_update(filter={
+                    "channel_id": c_id,
 
-            }, update={
-                "$set": {
-                    "current": (current+1)%len(s.get("sentences"))
-                }
-            })
+                }, update={
+                    "$set": {
+                        "current": (current+1)%len(s.get("sentences"))
+                    }
+                })
+            except AttributeError:
+                print(f"Can't send to channel with id: {c_id}")
+            except IndexError:
+                await c.send(content="No sentence were added! have a cake: 🎂🎂🎂🎂")
 
 
 
@@ -72,7 +77,7 @@ class MyBot(commands.Bot):
         async def _add_error(ctx, error):
             if isinstance(error, commands.errors.MissingRequiredArgument):
                 await ctx.send(content="No sentence was given to add, please input a sentence!")
-                
+
 
         @self.command("setup", pass_context=True)
         async def _setup(ctx: commands.Context):
