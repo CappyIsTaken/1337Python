@@ -30,7 +30,7 @@ class MyBot(commands.Bot):
         self.register_commands()
 
     
-    @tasks.loop(seconds=10)
+    @tasks.loop(time=time)
     async def post_1337(self):
         db = client["Sentences"]
         sentences = db["Sentences"]
