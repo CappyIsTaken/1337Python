@@ -72,6 +72,7 @@ class MyBot(commands.Bot):
         async def _add_error(ctx, error):
             if isinstance(error, commands.errors.MissingRequiredArgument):
                 await ctx.send(content="No sentence was given to add, please input a sentence!")
+                
 
         @self.command("setup", pass_context=True)
         async def _setup(ctx: commands.Context):
