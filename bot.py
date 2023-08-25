@@ -100,10 +100,11 @@ class MyBot(commands.Bot):
 
 
         @self.command("view", pass_context=True, aliases=["v"])
-        async def _view(ctx):
+        async def _view(ctx, index: int = 0):
             """
-            Shows all the sentences for this current channel
+            Shows all the sentences for this current channel, or if passed index: show at index
             """
+
             db = client["Sentences"]
             sentences = db["Sentences"]
             doc = sentences.find_one({
@@ -113,10 +114,16 @@ class MyBot(commands.Bot):
             if len(all_s) <= 0:
                 await ctx.before_message.edit(content="No sentences were found, bitchass, add some sentences!")
                 return
-            m = ""
-            for i,s in enumerate(all_s):
-                 m += f"{i+1}. `{textwrap.shorten(s, 25, placeholder='...')}`\n"
-            await ctx.before_message.edit(content=m)
+            if index <= 0:
+                m = ""
+                for i,s in enumerate(all_s):
+                    m += f"{i+1}. `{textwrap.shorten(s, 25, placeholder='...')}`\n"
+                await ctx.before_message.edit(content=m)
+            else:
+                try:
+                    await ctx.before_message.edit(content=all_s[index-1])
+                except IndexError:
+                    await ctx.before_message.edit(content="No sentence was found at that index!")
 
        
 
