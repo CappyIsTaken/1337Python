@@ -30,7 +30,7 @@ class MyBot(commands.Bot):
         self.register_commands()
 
     
-    @tasks.loop(time=time)
+    @tasks.loop(seconds=10)
     async def post_1337(self):
         db = client["Sentences"]
         sentences = db["Sentences"]
@@ -40,7 +40,7 @@ class MyBot(commands.Bot):
             current = s.get("current")
             c = discord.utils.get(self.get_all_channels(), id=c_id)
             try:
-                await c.send(content=s.get("sentences")[current])
+                await c.send(content=f"{s.get('sentences')[current]} @everyone")
                 sentences.find_one_and_update(filter={
                     "channel_id": c_id,
 
@@ -52,7 +52,7 @@ class MyBot(commands.Bot):
             except AttributeError:
                 print(f"Can't send to channel with id: {c_id}")
             except IndexError:
-                await c.send(content="No sentence were added! have a cake: 🎂🎂🎂🎂")
+                await c.send(content="No sentences were added! have a cake: 🎂🎂🎂🎂")
 
 
 
