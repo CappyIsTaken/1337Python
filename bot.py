@@ -113,7 +113,7 @@ class MyBot(commands.Bot):
                 await ctx.before_message.edit(content="The owner has disabled adding sentences, try again later!")
                 return
 
-            sentences.find_one_and_update(filter={
+            sentences.update_one(filter={
                 "channel_id": ctx.channel.id
             }, update={
                 "$push": {
