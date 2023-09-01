@@ -22,7 +22,7 @@ time = datetime.time(hour=13, minute=37, tzinfo=gettz("Asia/Jerusalem"))
 class MyBot(commands.Bot):
 
     async def on_ready(self):
-        print("Bot is ready!")
+        print(f"{self.user.display_name} is ready!")
         self.post_1337.start()
         @self.before_invoke
         async def before_command(ctx):
@@ -98,6 +98,21 @@ class MyBot(commands.Bot):
         
         
 
+        @self.command("test-post", pass_context=True, aliases=["tp"])
+        @commands.is_owner()
+        async def test_post(ctx):
+            """
+            Admin command to check posting!
+            """
+            await self.post_1337()
+            await ctx.send("Successful!")
+        
+        @test_post.error
+        async def _test_post_error(ctx, error):
+            if isinstance(error, commands.errors.NotOwner):
+                await ctx.send(content="You ain't the owner, don't try me!!!")  
+
+
 
         @self.command("view", pass_context=True, aliases=["v"])
         async def _view(ctx, index: int = 0):
@@ -115,7 +130,7 @@ class MyBot(commands.Bot):
                 await ctx.before_message.edit(content="No sentences were found, bitchass, add some sentences!")
                 return
             if index <= 0:
-                m = ""
+                m = f"Current: {doc.get('current')+1}\n"
                 for i,s in enumerate(all_s):
                     m += f"{i+1}. `{textwrap.shorten(s, 50, placeholder='...')}`\n"
                 await ctx.before_message.edit(content=m)
