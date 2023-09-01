@@ -129,6 +129,7 @@ class MyBot(commands.Bot):
 
 
         @self.command("setup", pass_context=True, aliases=["s"])
+        @commands.is_owner()
         async def _setup(ctx: commands.Context):
             """
             Sets up the channel for the bot!
