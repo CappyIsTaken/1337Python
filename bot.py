@@ -59,6 +59,43 @@ class MyBot(commands.Bot):
     def register_commands(self):
 
 
+        @self.command("unlock", pass_context=True, aliases=["u"])
+        @commands.is_owner()
+        async def _unlock(ctx: commands.Context):
+            db = client["Sentences"]
+            sentences = db["Sentences"]
+            sentences.find_one_and_update(filter={
+                "channel_id": ctx.channel.id
+            }, update={
+                "$set": {
+                    "locked": False
+                }
+            })
+            await ctx.before_message.edit(content="Unlocked the channel!")
+
+        
+        @_unlock.error
+        async def _unlock_error(ctx, error):
+            if isinstance(error, commands.errors.NotOwner):
+                await ctx.send(content="You ain't the owner, don't try me!!!")  
+        
+        @self.command("lock", pass_context=True, aliases=["l"])
+        @commands.is_owner()
+        async def _lock(ctx: commands.Context):
+            db = client["Sentences"]
+            sentences = db["Sentences"]
+            sentences.find_one_and_update(filter={
+                "channel_id": ctx.channel.id
+            }, update={
+                "$set": {
+                    "locked": True
+                }
+            })
+            await ctx.before_message.edit(content="Locked the channel!")
+        @_lock.error
+        async def _lock_error(ctx, error):
+            if isinstance(error, commands.errors.NotOwner):
+                await ctx.send(content="You ain't the owner, don't try me!!!") 
         
         @self.command("add", pass_context=True, aliases=["a"])
         async def _add(ctx: commands.Context, sentence: str):
@@ -67,6 +104,15 @@ class MyBot(commands.Bot):
             """
             db = client["Sentences"]
             sentences = db["Sentences"]
+
+            doc = sentences.find_one(filter={
+                "channel_id": ctx.channel.id
+            })
+            locked_state = doc.get("locked")
+            if locked_state:
+                await ctx.before_message.edit(content="The owner has disabled adding sentences, try again later!")
+                return
+
             sentences.find_one_and_update(filter={
                 "channel_id": ctx.channel.id
             }, update={
